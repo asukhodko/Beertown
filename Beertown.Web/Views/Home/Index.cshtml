@@ -1,0 +1,73 @@
+﻿@model Beertown.Web.Models.BeertownModel
+@{
+    ViewBag.Title = "Метрополитен Биртауна";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h2>@ViewBag.Title</h2>
+        <figure>
+            <figcaption>Схема линий</figcaption>
+            <img src="~/Content/Images/MetroMap.jpg" class="img-responsive" />
+        </figure>
+    </div>
+    <div class="col-md-4 text-center">
+        <h3>Поиск маршрута</h3>
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary()
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.StartStationId)
+                @Html.DropDownListFor(m => m.StartStationId, Model.Stations, new { @class = "form-control selectpicker form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.DestinationStationId)
+                @Html.DropDownListFor(m => m.DestinationStationId, Model.Stations, new { @class = "form-control selectpicker form-control" })
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Рассчитать маршрут" />
+            </div>
+
+            if (Model.Path != null)
+            {
+                <div class="panel panel-default form-group">
+                    <div class="panel-heading">маршрут</div>
+                    <div class="panel-body">
+                        @if (Model.Path.Count == 0)
+                        {
+                            <p>Маршрут пуст.</p>
+                        }
+                        else
+                        {
+                            foreach (var p in Model.Path)
+                            {
+                                <div class="row">
+                                    <div class="col-xs-2 text-right glyphicon glyphicon-option-vertical" style="color: @p.Station.LineColorCode"></div>
+                                    <div class="col-xs-6 text-left">@p.Station.StationName</div>
+                                    <div class="col-xs-4">@p.Duration мин.</div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="panel panel-default form-group">
+                    <div class="panel-heading">Стоимость проезда</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            @foreach (var c in Model.Cost)
+                            {
+                                <div class="col-xs-2 text-right glyphicon glyphicon-option-vertical" style="color: @c.LineColorCode"></div>
+                                <div class="col-xs-8 text-left">@c.CostItem</div>
+                                <div class="col-xs-2">@c.Cost р.</div>
+                            }
+                        </div>
+                    </div>
+                    <div class="panel-footer">Общая стоимость: @Model.Cost.Sum(p => p.Cost) р.</div>
+                </div>
+            }
+        }
+    </div>
+</div>
